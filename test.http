@@ -1,0 +1,36 @@
+### Get all todos
+GET http://localhost:8000/api/todos
+X-API-Key: RAHASIA
+Accept: application/json
+
+### Create new todo
+POST http://localhost:8000/api/todos
+X-API-Key: RAHASIA
+Accept: application/json
+Content-Type: application/json
+
+{
+  "user_id" : 1,
+  "title" : "Todo lain coba"
+}
+
+### Get todo by Id
+GET http://localhost:8000/api/todos/1
+X-API-Key: RAHASIA
+Accept: application/json
+
+### Update todo by id
+PUT http://localhost:8000/api/todos/3
+X-API-Key: RAHASIA
+Accept: application/json
+Content-Type: application/json
+
+{
+  "user_id" : 2,
+  "title" : "Todo coba lagi"
+}
+
+### Delete todo by id
+DELETE http://localhost:8000/api/todos/2
+X-API-Key: RAHASIA
+Accept: application/json
