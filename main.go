@@ -5,25 +5,29 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"satriyoaji/todolist-app-api/app"
-	"satriyoaji/todolist-app-api/controller"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/middleware"
-	"satriyoaji/todolist-app-api/repository"
-	"satriyoaji/todolist-app-api/service"
+	"satriyoaji/todolist-app-api/router"
 )
 
 func main() {
 
 	db := app.NewDB()
 	validate := validator.New()
-	todoRepository := repository.NewTodoRepository()
-	todoService := service.NewTodoService(todoRepository, db, validate)
-	todoController := controller.NewTodoController(todoService)
-	router := app.NewRouter(todoController)
+	mainRouter := router.NewRouter()
+
+	// Todo's env
+	mainRouter = router.NewTodoRouter(mainRouter, db, validate)
+
+	// User's env
+	mainRouter = router.NewUserRouter(mainRouter, db, validate)
+
+	// Master Role's env
+	mainRouter = router.NewRoleRouter(mainRouter, db, validate)
 
 	server := http.Server{
-		Addr:    "localhost:"+app.GoDotEnvVariable("APP_PORT"),
-		Handler: middleware.NewAuthMiddleware(router),
+		Addr:    "localhost:" + app.GoDotEnvVariable("APP_PORT"),
+		Handler: middleware.NewAuthMiddleware(mainRouter),
 	}
 
 	err := server.ListenAndServe()

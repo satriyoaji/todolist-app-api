@@ -13,15 +13,15 @@ import (
 
 type TodoServiceImpl struct {
 	TodoRepository repository.TodoRepository
-	DB                 *sql.DB
-	Validate           *validator.Validate
+	DB             *sql.DB
+	Validate       *validator.Validate
 }
 
 func NewTodoService(todoRepository repository.TodoRepository, DB *sql.DB, validate *validator.Validate) TodoService {
 	return &TodoServiceImpl{
 		TodoRepository: todoRepository,
-		DB:                 DB,
-		Validate:           validate,
+		DB:             DB,
+		Validate:       validate,
 	}
 }
 
@@ -35,7 +35,7 @@ func (service *TodoServiceImpl) Create(ctx context.Context, request todo.TodoCre
 
 	todo := domain.Todo{
 		UserId: request.UserId,
-		Title: request.Title,
+		Title:  request.Title,
 	}
 
 	todo = service.TodoRepository.Save(ctx, tx, todo)
@@ -95,7 +95,7 @@ func (service *TodoServiceImpl) FindAll(ctx context.Context) []todo.TodoResponse
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	categories := service.TodoRepository.FindAll(ctx, tx)
+	todos := service.TodoRepository.FindAll(ctx, tx)
 
-	return helper.ToTodoResponses(categories)
+	return helper.ToTodoResponses(todos)
 }
