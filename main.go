@@ -26,7 +26,7 @@ func main() {
 	mainRouter = router.NewRoleRouter(mainRouter, db, validate)
 
 	server := http.Server{
-		Addr:    "localhost:" + app.GoDotEnvVariable("APP_PORT"),
+		Addr:    app.GoDotEnvVariable("APP_HOST_DEV") + ":" + app.GoDotEnvVariable("APP_PORT"),
 		Handler: middleware.NewAuthMiddleware(mainRouter),
 	}
 
