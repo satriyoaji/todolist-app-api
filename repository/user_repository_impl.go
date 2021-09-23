@@ -20,7 +20,6 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user
 	SQL := "insert into users(fullname, email, password, forgot_password, role_id, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?)"
 	result, err := tx.ExecContext(ctx, SQL, user.Fullname, user.Email, user.Password, user.ForgotPassword, user.RoleId, time.Now(), time.Now())
 	helper.PanicIfError(err)
-
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
@@ -43,19 +42,15 @@ func (repository *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, us
 }
 
 func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error) {
-	SQL := `select users.id, users.fullname, users.email, users.password, users.forgot_password, users.role_id, roles.name AS role
-		from users 
-		LEFT JOIN roles 
-		ON users.role_id = roles.id
+	SQL := `select * from users 
 		where users.id = ?`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	user := domain.User{}
-	role := domain.Role{}
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Fullname, &user.Email, &user.Password, &user.ForgotPassword, &user.RoleId, &role.Name)
+		err := rows.Scan(&user.Id, &user.Fullname, &user.Email, &user.Password, &user.ForgotPassword, &user.RoleId, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 		return user, nil
 	} else {
@@ -64,10 +59,7 @@ func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.User {
-	SQL := `select users.id, users.fullname, users.email, users.password, users.forgot_password, users.role_id, roles.name AS role_name
-		from users 
-		LEFT JOIN roles 
-		ON users.role_id = roles.id`
+	SQL := `select * from users `
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -75,8 +67,7 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	var users []domain.User
 	for rows.Next() {
 		user := domain.User{}
-		role := domain.Role{}
-		err := rows.Scan(&user.Id, &user.Fullname, &user.Email, &user.Password, &user.ForgotPassword, &user.RoleId, &role.Name)
+		err := rows.Scan(&user.Id, &user.Fullname, &user.Email, &user.Password, &user.ForgotPassword, &user.RoleId, &user.CreatedAt, &user.UpdatedAt)
 		helper.PanicIfError(err)
 		users = append(users, user)
 	}

@@ -13,13 +13,15 @@ import (
 
 type UserServiceImpl struct {
 	UserRepository repository.UserRepository
+	RoleRepository repository.RoleRepository
 	DB             *sql.DB
 	Validate       *validator.Validate
 }
 
-func NewUserService(userRepository repository.UserRepository, DB *sql.DB, validate *validator.Validate) UserService {
+func NewUserService(userRepository repository.UserRepository, roleRepository repository.RoleRepository, DB *sql.DB, validate *validator.Validate) UserService {
 	return &UserServiceImpl{
 		UserRepository: userRepository,
+		RoleRepository: roleRepository,
 		DB:             DB,
 		Validate:       validate,
 	}
@@ -28,7 +30,6 @@ func NewUserService(userRepository repository.UserRepository, DB *sql.DB, valida
 func (service *UserServiceImpl) Create(ctx context.Context, request user.UserCreateRequest) user.UserResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
-
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
@@ -41,7 +42,6 @@ func (service *UserServiceImpl) Create(ctx context.Context, request user.UserCre
 		ForgotPassword: request.ForgotPassword,
 		RoleId:         request.RoleId,
 	}
-
 	user = service.UserRepository.Save(ctx, tx, user)
 
 	return helper.ToUserResponse(user)
@@ -62,7 +62,8 @@ func (service *UserServiceImpl) Update(ctx context.Context, request user.UserUpd
 
 	user.Fullname = request.Fullname
 	user.Email = request.Email
-	user.Password = request.Password
+	hashedPassword, _ := helper.HashPassword(request.Password)
+	user.Password = hashedPassword
 	user.ForgotPassword = request.ForgotPassword
 	user.RoleId = request.RoleId
 
@@ -103,6 +104,22 @@ func (service *UserServiceImpl) FindAll(ctx context.Context) []user.UserResponse
 	defer helper.CommitOrRollback(tx)
 
 	users := service.UserRepository.FindAll(ctx, tx)
+	listRoles := service.RoleRepository.FindAll(ctx, tx)
+	roleMaps := map[int]string{}
 
-	return helper.ToUserResponses(users)
+	for _, val := range listRoles {
+		roleMaps[val.Id] = val.Name
+	}
+	userResponses := make([]user.UserResponse, 0)
+
+	for _, val := range users {
+		userResponses = append(userResponses, user.UserResponse{
+			Id:       val.Id,
+			Fullname: val.Fullname,
+			Email:    val.Email,
+			RoleName: roleMaps[val.RoleId],
+		})
+	}
+
+	return userResponses
 }

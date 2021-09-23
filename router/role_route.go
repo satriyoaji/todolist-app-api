@@ -1,20 +1,12 @@
 package router
 
 import (
-	"database/sql"
-	"github.com/go-playground/validator/v10"
 	"github.com/julienschmidt/httprouter"
 	"satriyoaji/todolist-app-api/controller"
 	"satriyoaji/todolist-app-api/exception"
-	"satriyoaji/todolist-app-api/repository"
-	"satriyoaji/todolist-app-api/service"
 )
 
-func NewRoleRouter(router *httprouter.Router, db *sql.DB, validate *validator.Validate) *httprouter.Router {
-
-	roleRepository := repository.NewRoleRepository()
-	roleService := service.NewRoleService(roleRepository, db, validate)
-	roleController := controller.NewRoleController(roleService)
+func NewRoleRouter(router *httprouter.Router, roleController controller.RoleController) *httprouter.Router {
 
 	router.GET("/api/roles", roleController.FindAll)
 	router.GET("/api/roles/:roleId", roleController.FindById)

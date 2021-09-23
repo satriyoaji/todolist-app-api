@@ -7,14 +7,9 @@ import (
 
 func ToUserResponse(value domain.User) user.UserResponse {
 	return user.UserResponse{
-		Id:             value.Id,
-		Fullname:       value.Fullname,
-		Email:          value.Email,
-		Password:       value.Password,
-		ForgotPassword: value.ForgotPassword,
-		RoleId:         value.RoleId,
-		CreatedAt:      value.CreatedAt,
-		UpdatedAt:      value.UpdatedAt,
+		Id:       value.Id,
+		Fullname: value.Fullname,
+		Email:    value.Email,
 	}
 }
 
