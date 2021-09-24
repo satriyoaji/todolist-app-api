@@ -43,9 +43,11 @@ func main() {
 	userRepository := repository.NewUserRepository()
 	userService := service.NewUserService(userRepository, roleRepository, db, validate)
 	userController := controller.NewUserController(userService)
+	authController := controller.NewAuthController(userService)
 
 	mainRouter = router.NewTodoRouter(mainRouter, todoController)
 	mainRouter = router.NewUserRouter(mainRouter, userController)
+	mainRouter = router.NewAuthRouter(mainRouter, authController)
 	mainRouter = router.NewRoleRouter(mainRouter, roleController)
 
 	server := http.Server{

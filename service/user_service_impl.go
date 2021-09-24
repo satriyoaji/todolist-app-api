@@ -4,12 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt"
 	"satriyoaji/todolist-app-api/exception"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/model/domain"
+	"satriyoaji/todolist-app-api/model/web/auth"
 	"satriyoaji/todolist-app-api/model/web/user"
 	"satriyoaji/todolist-app-api/repository"
+	"strconv"
+	"time"
 )
+
+const SecretKey = "secret"
 
 type UserServiceImpl struct {
 	UserRepository repository.UserRepository
@@ -104,6 +110,56 @@ func (service *UserServiceImpl) FindAll(ctx context.Context) []user.UserResponse
 	defer helper.CommitOrRollback(tx)
 
 	users := service.UserRepository.FindAll(ctx, tx)
+	userResponsesWithRole := service.assignRoleNameUser(ctx, tx, users)
+
+	return userResponsesWithRole
+}
+
+func (service *UserServiceImpl) Login(ctx context.Context, request auth.AuthLoginRequest) auth.AuthResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user := domain.User{}
+	user, err = service.UserRepository.FindByEmail(ctx, tx, request.Email)
+	if user.Id <= 0 {
+		panic(exception.NewNotFoundError("User not found"))
+	}
+
+	//match hashed password
+	match, err := helper.CheckPasswordHash(request.Password, user.Password)
+	if !match {
+		panic(exception.NewNotFoundError("invalid credential !"))
+	}
+
+	// assign role name
+	users := []domain.User{user}
+	userResponsesWithRole := service.assignRoleNameUser(ctx, tx, users)
+	newUserResponse := userResponsesWithRole[0]
+
+	//set JWT
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    strconv.Itoa(int(newUserResponse.Id)),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
+	})
+
+	token, err := claims.SignedString([]byte(SecretKey))
+	helper.PanicIfError(err)
+
+	return helper.ToAuthResponse(userResponsesWithRole[0], token)
+}
+
+func (service *UserServiceImpl) Logout(ctx context.Context) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	//action delete jwt token
+}
+
+func (service *UserServiceImpl) assignRoleNameUser(ctx context.Context, tx *sql.Tx, users []domain.User) []user.UserResponse {
 	listRoles := service.RoleRepository.FindAll(ctx, tx)
 	roleMaps := map[int]string{}
 

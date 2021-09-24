@@ -12,4 +12,5 @@ type UserRepository interface {
 	Delete(ctx context.Context, tx *sql.Tx, user domain.User)
 	FindById(ctx context.Context, tx *sql.Tx, userId int) (domain.User, error)
 	FindAll(ctx context.Context, tx *sql.Tx) []domain.User
+	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error)
 }
