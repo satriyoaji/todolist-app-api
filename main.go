@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"satriyoaji/todolist-app-api/app"
 	"satriyoaji/todolist-app-api/controller"
 	"satriyoaji/todolist-app-api/helper"
-	"satriyoaji/todolist-app-api/middleware"
 	"satriyoaji/todolist-app-api/repository"
 	"satriyoaji/todolist-app-api/router"
 	"satriyoaji/todolist-app-api/service"
 )
 
 type Logger struct {
-	handler http.Handler
+	handler *httprouter.Router
 }
 
 func (l *Logger) serveHTTP(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +52,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    app.GoDotEnvVariable("APP_HOST_DEV") + ":" + app.GoDotEnvVariable("APP_PORT"),
-		Handler: middleware.NewAuthMiddleware(mainRouter),
+		Handler: mainRouter,
 	}
 
 	err := server.ListenAndServe()

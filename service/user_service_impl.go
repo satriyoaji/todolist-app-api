@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
+	"satriyoaji/todolist-app-api/app"
 	"satriyoaji/todolist-app-api/exception"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/model/domain"
@@ -14,8 +15,6 @@ import (
 	"strconv"
 	"time"
 )
-
-const SecretKey = "secret"
 
 type UserServiceImpl struct {
 	UserRepository repository.UserRepository
@@ -137,15 +136,14 @@ func (service *UserServiceImpl) Login(ctx context.Context, request auth.AuthLogi
 	// assign role name
 	users := []domain.User{user}
 	userResponsesWithRole := service.assignRoleNameUser(ctx, tx, users)
-	newUserResponse := userResponsesWithRole[0]
 
 	//set JWT
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(newUserResponse.Id)),
+		Issuer:    strconv.Itoa(int(user.Id)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
 	})
 
-	token, err := claims.SignedString([]byte(SecretKey))
+	token, err := claims.SignedString([]byte(app.GoDotEnvVariable("JWT_SECRET")))
 	helper.PanicIfError(err)
 
 	return helper.ToAuthResponse(userResponsesWithRole[0], token)
@@ -156,7 +154,7 @@ func (service *UserServiceImpl) Logout(ctx context.Context) {
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	//action delete jwt token
+	//action make expired current jwt token
 }
 
 func (service *UserServiceImpl) assignRoleNameUser(ctx context.Context, tx *sql.Tx, users []domain.User) []user.UserResponse {

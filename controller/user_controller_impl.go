@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"satriyoaji/todolist-app-api/exception"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/model/web"
 	"satriyoaji/todolist-app-api/model/web/user"
@@ -21,6 +22,12 @@ func NewUserController(userService service.UserService) UserController {
 }
 
 func (controller *UserControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	userCreateRequest := user.UserCreateRequest{}
 	helper.ReadFromRequestBody(request, &userCreateRequest)
 
@@ -35,6 +42,12 @@ func (controller *UserControllerImpl) Create(writer http.ResponseWriter, request
 }
 
 func (controller *UserControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	userUpdateRequest := user.UserUpdateRequest{}
 	helper.ReadFromRequestBody(request, &userUpdateRequest)
 
@@ -55,6 +68,12 @@ func (controller *UserControllerImpl) Update(writer http.ResponseWriter, request
 }
 
 func (controller *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	userId := params.ByName("userId")
 	id, err := strconv.Atoi(userId)
 	helper.PanicIfError(err)
@@ -69,6 +88,12 @@ func (controller *UserControllerImpl) Delete(writer http.ResponseWriter, request
 }
 
 func (controller *UserControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	userId := params.ByName("userId")
 	id, err := strconv.Atoi(userId)
 	helper.PanicIfError(err)
@@ -84,7 +109,14 @@ func (controller *UserControllerImpl) FindById(writer http.ResponseWriter, reque
 }
 
 func (controller *UserControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	userResponses := controller.UserService.FindAll(request.Context())
+
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",
