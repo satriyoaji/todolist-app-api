@@ -24,12 +24,3 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 }
-
-//func CreateTokenFromUser(user domain.User) (string, error){
-//	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-//		Issuer:    strconv.Itoa(int(user.Id)),
-//		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
-//	})
-//
-//	return claims.SignedString([]byte(app.GoDotEnvVariable("JWT_SECRET")))
-//}

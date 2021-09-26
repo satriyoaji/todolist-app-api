@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"satriyoaji/todolist-app-api/exception"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/model/web"
 	"satriyoaji/todolist-app-api/model/web/auth"
@@ -34,6 +35,11 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 }
 
 func (controller *AuthControllerImpl) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
 
 	controller.UserService.Logout(request.Context())
 	webResponse := web.WebResponse{

@@ -130,7 +130,7 @@ func (service *UserServiceImpl) Login(ctx context.Context, request auth.AuthLogi
 	//match hashed password
 	match, err := helper.CheckPasswordHash(request.Password, user.Password)
 	if !match {
-		panic(exception.NewNotFoundError("invalid credential !"))
+		panic(exception.NewUnauthorizedError("invalid credential !"))
 	}
 
 	// assign role name
@@ -138,9 +138,10 @@ func (service *UserServiceImpl) Login(ctx context.Context, request auth.AuthLogi
 	userResponsesWithRole := service.assignRoleNameUser(ctx, tx, users)
 
 	//set JWT
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    strconv.Itoa(int(user.Id)),
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": strconv.Itoa(int(user.Id)),
+		"role_id": strconv.Itoa(int(user.RoleId)),
+		"exp":     time.Now().Add(time.Minute * 30).Unix(),
 	})
 
 	token, err := claims.SignedString([]byte(app.GoDotEnvVariable("JWT_SECRET")))
@@ -155,6 +156,7 @@ func (service *UserServiceImpl) Logout(ctx context.Context) {
 	defer helper.CommitOrRollback(tx)
 
 	//action make expired current jwt token
+
 }
 
 func (service *UserServiceImpl) assignRoleNameUser(ctx context.Context, tx *sql.Tx, users []domain.User) []user.UserResponse {

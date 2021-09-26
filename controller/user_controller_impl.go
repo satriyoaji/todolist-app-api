@@ -114,6 +114,10 @@ func (controller *UserControllerImpl) FindAll(writer http.ResponseWriter, reques
 	if err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
+	_, err2 := helper.CheckRoleAdmin(request)
+	if err2 != nil {
+		panic(exception.UnauthorizedError{err2.Error()})
+	}
 
 	userResponses := controller.UserService.FindAll(request.Context())
 

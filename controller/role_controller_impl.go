@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"satriyoaji/todolist-app-api/exception"
 	"satriyoaji/todolist-app-api/helper"
 	"satriyoaji/todolist-app-api/model/web"
 	"satriyoaji/todolist-app-api/model/web/role"
@@ -21,6 +22,12 @@ func NewRoleController(roleService service.RoleService) RoleController {
 }
 
 func (controller *RoleControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	roleCreateRequest := role.RoleCreateRequest{}
 	helper.ReadFromRequestBody(request, &roleCreateRequest)
 
@@ -35,6 +42,12 @@ func (controller *RoleControllerImpl) Create(writer http.ResponseWriter, request
 }
 
 func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	roleUpdateRequest := role.RoleUpdateRequest{}
 	helper.ReadFromRequestBody(request, &roleUpdateRequest)
 
@@ -55,6 +68,12 @@ func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request
 }
 
 func (controller *RoleControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	roleId := params.ByName("roleId")
 	id, err := strconv.Atoi(roleId)
 	helper.PanicIfError(err)
@@ -69,6 +88,12 @@ func (controller *RoleControllerImpl) Delete(writer http.ResponseWriter, request
 }
 
 func (controller *RoleControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	roleId := params.ByName("roleId")
 	id, err := strconv.Atoi(roleId)
 	helper.PanicIfError(err)
@@ -84,6 +109,12 @@ func (controller *RoleControllerImpl) FindById(writer http.ResponseWriter, reque
 }
 
 func (controller *RoleControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	_, err := helper.VerifyToken(request)
+	if err != nil {
+		panic(exception.UnauthorizedError{err.Error()})
+	}
+
 	roleResponses := controller.RoleService.FindAll(request.Context())
 	webResponse := web.WebResponse{
 		Code:   200,
