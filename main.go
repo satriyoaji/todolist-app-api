@@ -45,10 +45,16 @@ func main() {
 	userController := controller.NewUserController(userService)
 	authController := controller.NewAuthController(userService)
 
+	// Master Attachment's env
+	attachmentRepository := repository.NewAttachmentRepository()
+	attachmentService := service.NewAttachmentService(attachmentRepository, db, validate)
+	attachmentController := controller.NewAttachmentController(attachmentService)
+
 	mainRouter = router.NewTodoRouter(mainRouter, todoController)
 	mainRouter = router.NewUserRouter(mainRouter, userController)
 	mainRouter = router.NewAuthRouter(mainRouter, authController)
 	mainRouter = router.NewRoleRouter(mainRouter, roleController)
+	mainRouter = router.NewAttachmentRouter(mainRouter, attachmentController)
 
 	server := http.Server{
 		Addr:    app.GoDotEnvVariable("APP_HOST_DEV") + ":" + app.GoDotEnvVariable("APP_PORT"),
