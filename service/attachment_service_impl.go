@@ -34,9 +34,9 @@ func (service *AttachmentServiceImpl) Create(ctx context.Context, request attach
 	defer helper.CommitOrRollback(tx)
 
 	attachment := domain.Attachment{
-		TodoId:   request.TodoId,
-		Caption:  request.Caption,
-		Location: request.Location,
+		TodoId:  request.TodoId,
+		Caption: request.Caption,
+		File:    request.File,
 	}
 
 	attachment = service.AttachmentRepository.Save(ctx, tx, attachment)
@@ -59,7 +59,7 @@ func (service *AttachmentServiceImpl) Update(ctx context.Context, request attach
 
 	attachment.TodoId = request.TodoId
 	attachment.Caption = request.Caption
-	attachment.Location = request.Location
+	attachment.File = request.File
 
 	attachment = service.AttachmentRepository.Update(ctx, tx, attachment)
 

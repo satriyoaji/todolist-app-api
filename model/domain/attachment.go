@@ -5,7 +5,7 @@ import "time"
 type Attachment struct {
 	Id        int
 	TodoId    int
-	Location  string
+	File      string
 	Caption   string
 	CreatedAt time.Time
 	UpdatedAt time.Time

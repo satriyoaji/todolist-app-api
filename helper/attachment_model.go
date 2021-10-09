@@ -9,7 +9,7 @@ func ToAttachmentResponse(value domain.Attachment) attachment.AttachmentResponse
 	return attachment.AttachmentResponse{
 		Id:        value.Id,
 		TodoId:    value.TodoId,
-		Location:  value.Location,
+		File:      value.File,
 		Caption:   value.Caption,
 		CreatedAt: value.CreatedAt,
 		UpdatedAt: value.UpdatedAt,
