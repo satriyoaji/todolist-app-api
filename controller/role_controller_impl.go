@@ -23,8 +23,7 @@ func NewRoleController(roleService service.RoleService) RoleController {
 
 func (controller *RoleControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -43,8 +42,7 @@ func (controller *RoleControllerImpl) Create(writer http.ResponseWriter, request
 
 func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -69,8 +67,7 @@ func (controller *RoleControllerImpl) Update(writer http.ResponseWriter, request
 
 func (controller *RoleControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -89,8 +86,7 @@ func (controller *RoleControllerImpl) Delete(writer http.ResponseWriter, request
 
 func (controller *RoleControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -110,8 +106,7 @@ func (controller *RoleControllerImpl) FindById(writer http.ResponseWriter, reque
 
 func (controller *RoleControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 

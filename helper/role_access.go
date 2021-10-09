@@ -12,7 +12,9 @@ func CheckRoleAdmin(r *http.Request) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
-	PanicIfError(err)
+	if err != nil {
+		return token, err
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims["role_id"] != "1" {

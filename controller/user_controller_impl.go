@@ -23,8 +23,7 @@ func NewUserController(userService service.UserService) UserController {
 
 func (controller *UserControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -43,8 +42,7 @@ func (controller *UserControllerImpl) Create(writer http.ResponseWriter, request
 
 func (controller *UserControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -69,8 +67,7 @@ func (controller *UserControllerImpl) Update(writer http.ResponseWriter, request
 
 func (controller *UserControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -89,8 +86,7 @@ func (controller *UserControllerImpl) Delete(writer http.ResponseWriter, request
 
 func (controller *UserControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
 
@@ -110,13 +106,11 @@ func (controller *UserControllerImpl) FindById(writer http.ResponseWriter, reque
 
 func (controller *UserControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
 	}
-	_, err2 := helper.CheckRoleAdmin(request)
-	if err2 != nil {
-		panic(exception.UnauthorizedError{err2.Error()})
+	if _, errCheckRole := helper.CheckRoleAdmin(request); errCheckRole != nil {
+		panic(exception.UnauthorizedError{errCheckRole.Error()})
 	}
 
 	userResponses := controller.UserService.FindAll(request.Context())

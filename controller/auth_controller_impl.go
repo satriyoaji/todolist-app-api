@@ -36,9 +36,11 @@ func (controller *AuthControllerImpl) Login(writer http.ResponseWriter, request 
 
 func (controller *AuthControllerImpl) Logout(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
-	_, err := helper.VerifyToken(request)
-	if err != nil {
+	if _, err := helper.VerifyToken(request); err != nil {
 		panic(exception.UnauthorizedError{err.Error()})
+	}
+	if errExpired := helper.MakeExpiredToken(request); errExpired != nil {
+		panic(exception.UnauthorizedError{errExpired.Error()})
 	}
 
 	controller.UserService.Logout(request.Context())
